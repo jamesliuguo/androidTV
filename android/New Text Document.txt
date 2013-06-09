@@ -1,0 +1,35 @@
+import java.awt.Rectangle;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+class MovableObject
+{
+	
+}
+class ResourceConfig
+{
+	public String url = "";
+	public String backgroud = "";
+	public Rectangle top = null;
+	public topResource = "";
+}
+public class TEST {
+
+	/**
+	 * @param args
+	 * @throws IOException 
+	 */
+	
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+		Properties properties = new Properties();
+		final InputStream cfg = new FileInputStream("f:\\p.cfg");
+		properties.load(cfg);
+		String somekey = properties.getProperty("dbpassword");
+		String kk = properties.getProperty("dbuser"); 
+	}
+
+}
