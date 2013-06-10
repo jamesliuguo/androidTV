@@ -1,0 +1,10 @@
+The easiest way is create an AVD with an SD card.
+
+In Eclipse: Window=> android SDK and AVD manager=>New :
+
+-give a name to your AVD
+-give a SDK target
+-give size to the wanted SDcard
+-create the new AVD
+
+Refer this LINK.
