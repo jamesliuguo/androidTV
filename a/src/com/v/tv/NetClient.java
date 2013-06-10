@@ -18,13 +18,15 @@ import org.apache.http.util.EntityUtils;
 import android.os.Environment;
 
 public class NetClient {
-	
-	public boolean downloadFile(String destUrl, String fileName)
+	static public boolean bDownload = false;
+	public boolean downloadFile(String destUrl)
 	{
-		destUrl = "http://192.168.1.107/a.avi";
-		fileName = Environment.getExternalStorageDirectory() +"/a.avi";
+		String fileName = Environment.getExternalStorageDirectory() + Utility.getFileNameFromPath(destUrl) ;
 		boolean bExist = (new File(fileName).exists());
-		if (bExist) return true;
+		if (bExist) {
+			bDownload = true;
+			return true;
+		}
 		
 		FileOutputStream fos = null;
 		BufferedInputStream bis = null;
@@ -38,18 +40,11 @@ public class NetClient {
 		try{
 			url = new URL(destUrl);
 			httpUrl = (HttpURLConnection) url.openConnection();
-			//连接指定的资源
 			httpUrl.connect();
-			//获取网络输入流
 			bis = new BufferedInputStream(httpUrl.getInputStream());
-			//建立文件
 			fos = new FileOutputStream(fileName);
-
-			//f (this.DEBUG)
-			 //         System.out.println("正在获取链接[" + destUrl + "]的内容...\n将其保存为文件[" +
-			  //                           fileName + "]");
-			//保存文件
-			 while ((size = bis.read(buf)) != -1)
+			
+			while ((size = bis.read(buf)) != -1)
 			            fos.write(buf, 0, size);
 
 			 fos.close();
@@ -62,6 +57,7 @@ public class NetClient {
 			bRet = false;
 		}
 		
+		bDownload = true;
 		return bRet;
 
 	}
