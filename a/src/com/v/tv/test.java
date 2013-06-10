@@ -5,6 +5,8 @@ import junit.framework.TestCase;
 public class test extends TestCase {
 	public void test()
 	{
-		System.out.print("test");
+		NetClient c = new NetClient();
+		String ret = c.Get("");
+		System.out.print(ret);
 	}
 }

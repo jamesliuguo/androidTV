@@ -9,5 +9,18 @@ public class PlayerActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+
+        //String str = c.Get("");
+        new Thread(downloadRun).start();  
     }
+    
+    public Runnable downloadRun = new Runnable(){  
+	    @Override  
+	    public void run() {  
+	        // TODO Auto-generated method stub  
+	            NetClient c = new NetClient();
+	            String str = c.Get("");
+	    }
+    } ;
 }
