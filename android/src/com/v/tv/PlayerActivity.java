@@ -45,6 +45,7 @@ public class PlayerActivity extends Activity {
         
         timerQueryServer = new java.util.Timer(true); 
         timerQueryServer.schedule(taskQueryServer, new Date(), 2000);
+ 
     }
     
     public Runnable downloadRun = new Runnable(){  
@@ -52,9 +53,9 @@ public class PlayerActivity extends Activity {
 	    public void run() {  
 	        // TODO Auto-generated method stub  
 	            NetClient c = new NetClient();
-	            c.downloadFile("http://192.168.1.107/Client.cfg");
+	            c.downloadFile(AppKernel.config.ServerURL + "Client.cfg");
 	            AppKernel.netStatus = Net_Status.DownloadingMovie;
-	            c.downloadFile("http://192.168.1.107/a.mp4");
+	            c.downloadFile(AppKernel.config.ServerURL +"a.mp4");
 	            AppKernel.netStatus = Net_Status.Finish;
 	    }
     } ;
@@ -62,8 +63,8 @@ public class PlayerActivity extends Activity {
         @Override  
         public void handleMessage(Message msg) {  
             if(msg.what == 1) {  
-                final String filename = Environment.getExternalStorageDirectory()+"/a.mp4";
     	        try{
+                    String filename = (String) msg.obj;
     	            video.setVideoPath(filename);
         	        video.setMediaController(new MediaController(PlayerActivity.this));
         	        video.requestFocus();
@@ -88,6 +89,9 @@ public class PlayerActivity extends Activity {
     			NetClient.bDownload = false;
     	        Message msg = mHandler.obtainMessage();  
                 msg.what = 1;  
+                String local = AppEnv.getLocalFile(AppKernel.config.ServerURL+"a.mp4");
+                msg.obj = local;
+               // msg.obj 
                 msg.sendToTarget(); 
     	        
     	        timerStartupDownload.cancel();

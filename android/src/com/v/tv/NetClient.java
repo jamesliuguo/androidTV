@@ -68,7 +68,7 @@ public class NetClient {
 	public String Get(String url)
 	{
 		String strRet = "";
-		url = "http://192.168.1.107/service.php?A=B";
+		url = "http://192.168.1.105/service.php?A=B";
 		HttpGet get = new HttpGet(url);
 		try{
 			HttpClient httpclient = new DefaultHttpClient();
