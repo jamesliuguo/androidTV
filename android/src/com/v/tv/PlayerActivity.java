@@ -5,11 +5,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.MediaController;
 import android.widget.VideoView;
 
@@ -40,6 +43,9 @@ public class PlayerActivity extends Activity {
         AppKernel.appStatus = App_Status.waitingResource;
         new Thread(downloadRun).start();  
         
+ 
+        getIP();
+        
         timerStartupDownload = new java.util.Timer(true); 
         timerStartupDownload.schedule(timerTaskDownload, new Date(), 2000);
         
@@ -47,7 +53,33 @@ public class PlayerActivity extends Activity {
         timerQueryServer.schedule(taskQueryServer, new Date(), 2000);
  
     }
-    
+    public String strIP;
+    private void getIP()
+    {
+    	AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+    	alert.setTitle("Title");
+    	alert.setMessage("Message");
+
+    	// Set an EditText view to get user input 
+    	final EditText input = new EditText(this);
+    	alert.setView(input);
+
+    	alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+    	public void onClick(DialogInterface dialog, int whichButton) {
+    		strIP = input.getText();
+    	  // Do something with value!
+    	  }
+    	});
+
+    	alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    	  public void onClick(DialogInterface dialog, int whichButton) {
+    	    // Canceled.
+    	  }
+    	});
+
+    	alert.show();
+    }
     public Runnable downloadRun = new Runnable(){  
 	    @Override  
 	    public void run() {  
