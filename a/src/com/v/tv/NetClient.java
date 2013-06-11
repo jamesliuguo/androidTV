@@ -21,7 +21,7 @@ public class NetClient {
 	static public boolean bDownload = false;
 	public boolean downloadFile(String destUrl)
 	{
-		String fileName = Environment.getExternalStorageDirectory() + Utility.getFileNameFromPath(destUrl) ;
+		String fileName = AppEnv.getLocalFile(destUrl);
 		boolean bExist = (new File(fileName).exists());
 		if (bExist) {
 			bDownload = true;

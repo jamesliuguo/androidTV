@@ -16,19 +16,28 @@ public class PlayerActivity extends Activity {
 	public MediaController mCtl = null;
 	public VideoView  video = null;
 	public String fileName = "http://192.168.1.107/a.mp4";
-	private java.util.Timer timer = null;
+	private java.util.Timer timerStartupDownload = null;
+	private java.util.Timer timerQueryServer = null;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-       // mCtl = (MediaController) findViewById(R.id.mediaController1);
+
+        int i = 0;
+        i = 8;
+        System.out.print(i);
+        
         video = (VideoView) findViewById(R.id.videoView1);
        
+        AppKernel.appStatus = App_Status.waitingResource;
         new Thread(downloadRun).start();  
         
-        timer = new java.util.Timer(true); 
-        timer.schedule(timerTask, new Date(), 2000);
+        timerStartupDownload = new java.util.Timer(true); 
+        timerStartupDownload.schedule(timerTaskDownload, new Date(), 2000);
+        
+        timerQueryServer = new java.util.Timer(true); 
+        timerQueryServer.schedule(taskQueryServer, new Date(), 2000);
     }
     
     public Runnable downloadRun = new Runnable(){  
@@ -36,9 +45,10 @@ public class PlayerActivity extends Activity {
 	    public void run() {  
 	        // TODO Auto-generated method stub  
 	            NetClient c = new NetClient();
-	            String str = c.Get("");
+	            c.downloadFile("http://192.168.1.107/Client.cfg");
+	            AppKernel.netStatus = Net_Status.DownloadingMovie;
 	            c.downloadFile("http://192.168.1.107/a.mp4");
-	           // c.downloadFile("http://192.168.1.107/a.avi");
+	            AppKernel.netStatus = Net_Status.Finish;
 	    }
     } ;
     Handler mHandler = new Handler() {  
@@ -63,7 +73,7 @@ public class PlayerActivity extends Activity {
         }  
     };
     // 
-    public TimerTask timerTask = new TimerTask() {   
+    public TimerTask timerTaskDownload = new TimerTask() {   
     	public void run() {   //implemented with sub-thread
     		System.out.print("task");
     		if (NetClient.bDownload)
@@ -73,9 +83,17 @@ public class PlayerActivity extends Activity {
                 msg.what = 1;  
                 msg.sendToTarget(); 
     	        
-    	        timer.cancel();
-
+    	        timerStartupDownload.cancel();
     		}
+    		
     	 }   
     };  
+    // 
+    public TimerTask taskQueryServer = new TimerTask() {   
+    	public void run() {   //implemented with sub-thread
+    		System.out.print("task");
+    		// get task and execute, sendToget the message
+    	 }   
+    };
+    
 }
