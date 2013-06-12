@@ -6,11 +6,16 @@ import java.util.TimerTask;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.MediaController;
@@ -67,7 +72,7 @@ public class PlayerActivity extends Activity {
 
     	alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
     	public void onClick(DialogInterface dialog, int whichButton) {
-    		strIP = input.getText();
+    		//strIP = input.getText();
     	  // Do something with value!
     	  }
     	});
@@ -91,6 +96,7 @@ public class PlayerActivity extends Activity {
 	            AppKernel.netStatus = Net_Status.Finish;
 	    }
     } ;
+
     Handler mHandler = new Handler() {  
         @Override  
         public void handleMessage(Message msg) {  
@@ -98,9 +104,49 @@ public class PlayerActivity extends Activity {
     	        try{
                     String filename = (String) msg.obj;
     	            video.setVideoPath(filename);
-        	        video.setMediaController(new MediaController(PlayerActivity.this));
+    	            final MediaController mc = new MediaController(PlayerActivity.this);
+        	        video.setMediaController(mc);
         	        video.requestFocus();
         	        video.start();
+        	        video.setOnCompletionListener(new OnCompletionListener() {
+                        public void onCompletion(MediaPlayer mp) {
+                           // stopAudio();
+                        	System.out.print("on complettion");
+                        	/*try{
+                            	PowerManager pManager=(PowerManager) getSystemService(Context.POWER_SERVICE);  
+                            	pManager.reboot("");   		
+                        	}
+                        	catch (Exception e)
+                        	{
+                        		String s = e.getMessage();
+                        		System.out.print(s);
+                        	}*/
+                        	String cmd = "su -c shutdown";
+                            try{
+		                           Runtime.getRuntime().exec(cmd);
+		                           Runtime.getRuntime().exec("su");
+		                           Runtime.getRuntime().exec("reboot");
+		                           System.exit(0);
+		                           
+		                      }
+                            catch(Exception e){
+		                          e.printStackTrace();
+		                      }
+                            
+                        	//pManager.
+                            //    Intent i= new Intent( Intent.ACTION_REBOOT);  
+                              //  sendBroadcast( i );  
+                               
+                             //   shutdown():  
+                           //     Intent i= new Intent( Intent.ACTION_SHUTDOWN);  
+                            //    sendBroadcast( i );  
+                                  
+                      
+                                
+                        }
+                    });
+
+        	        //setOnInfoListener (MediaPlayer.OnInfoListener listener)
     	        }
     	        catch (Exception e)
     	        {
