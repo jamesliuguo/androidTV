@@ -88,6 +88,7 @@ public class PlayerActivity extends Activity {
     public Runnable downloadRun = new Runnable(){  
 	    @Override  
 	    public void run() {  
+          
 	        // TODO Auto-generated method stub  
 	            NetClient c = new NetClient();
 	            c.downloadFile(AppKernel.config.ServerURL + "Client.cfg");
@@ -112,26 +113,8 @@ public class PlayerActivity extends Activity {
                         public void onCompletion(MediaPlayer mp) {
                            // stopAudio();
                         	System.out.print("on complettion");
-                        	/*try{
-                            	PowerManager pManager=(PowerManager) getSystemService(Context.POWER_SERVICE);  
-                            	pManager.reboot("");   		
-                        	}
-                        	catch (Exception e)
-                        	{
-                        		String s = e.getMessage();
-                        		System.out.print(s);
-                        	}*/
-                        	String cmd = "su -c shutdown";
-                            try{
-		                           Runtime.getRuntime().exec(cmd);
-		                           Runtime.getRuntime().exec("su");
-		                           Runtime.getRuntime().exec("reboot");
-		                           System.exit(0);
-		                           
-		                      }
-                            catch(Exception e){
-		                          e.printStackTrace();
-		                      }
+                	
+
                             
                         	//pManager.
                             //    Intent i= new Intent( Intent.ACTION_REBOOT);  
