@@ -37,19 +37,17 @@ public class PlayerActivity extends Activity {
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, 
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
                 
+         // Hide status bar
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.main);
-
-        int i = 0;
-        i = 8;
-        System.out.print(i);
-        
+       
         video = (VideoView) findViewById(R.id.videoView1);
        
         AppKernel.appStatus = App_Status.waitingResource;
         new Thread(downloadRun).start();  
         
  
-        getIP();
+       // getIP();
         
         timerStartupDownload = new java.util.Timer(true); 
         timerStartupDownload.schedule(timerTaskDownload, new Date(), 2000);
@@ -94,7 +92,7 @@ public class PlayerActivity extends Activity {
 	            c.downloadFile(AppKernel.config.ServerURL + "Client.cfg");
 	            AppKernel.netStatus = Net_Status.DownloadingMovie;
 	            c.downloadFile(AppKernel.config.ServerURL +"a.mp4");
-	            AppKernel.netStatus = Net_Status.Finish;
+	            AppKernel.netStatus = Net_Status.finish;
 	    }
     } ;
 
