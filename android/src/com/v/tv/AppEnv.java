@@ -4,14 +4,14 @@ import android.os.Environment;
 
 public class AppEnv {
 	private static String localCachePath = null;
-	private static String getLocalPath()
+	public static String getLocalPath()
 	{
 		if (localCachePath != null) return localCachePath;
 		
 	   //File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 	   String err = null;
 	   try{
-		   localCachePath = Environment.getExternalStorageDirectory().getAbsolutePath();
+		   localCachePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Player/";
 	   }
 	   catch(Exception e) {
 		   err = e.getMessage();

@@ -1,6 +1,7 @@
 package com.v.tv;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -89,10 +90,22 @@ public class PlayerActivity extends Activity {
           
 	        // TODO Auto-generated method stub  
 	            NetClient c = new NetClient();
-	            c.downloadFile(AppKernel.config.ServerURL + "Client.cfg");
-	            AppKernel.netStatus = Net_Status.DownloadingMovie;
-	            c.downloadFile(AppKernel.config.ServerURL +"a.mp4");
-	            AppKernel.netStatus = Net_Status.finish;
+	            
+	            Iterator<DownloadItem> it = Configuration.siteConfig.listFiles.iterator();
+	            while(it.hasNext()) {
+	            	DownloadItem item = it.next();
+	            	String localFile = AppEnv.getLocalFile(item.URL);
+	            	boolean exist = Utility.fileExists(localFile);
+	            	if (exist){
+	            		item.status = Net_Status.finish;
+	            	}
+	            	else {
+	            		c.downloadFile(item.URL);
+	    	            AppKernel.netStatus = Net_Status.downloadingMovie;
+	            	}
+	            	
+	            }
+	            
 	    }
     } ;
 
@@ -148,7 +161,7 @@ public class PlayerActivity extends Activity {
     			NetClient.bDownload = false;
     	        Message msg = mHandler.obtainMessage();  
                 msg.what = 1;  
-                String local = AppEnv.getLocalFile(AppKernel.config.ServerURL+"a.mp4");
+                String local = "";//AppEnv.getLocalFile(AppKernel.config.ServerURL+"a.mp4");
                 msg.obj = local;
                // msg.obj 
                 msg.sendToTarget(); 

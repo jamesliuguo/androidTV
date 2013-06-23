@@ -10,7 +10,8 @@ enum App_Status
 }
 enum Net_Status
 {
-	DownloadingMovie,
+	pending,
+	downloadingMovie,
 	finish,
 }
 public class AppKernel {

@@ -22,12 +22,8 @@ public class NetClient {
 	public boolean downloadFile(String destUrl)
 	{
 		String fileName = AppEnv.getLocalFile(destUrl);
-		boolean bExist = (new File(fileName).exists());
-		if (bExist) {
-			bDownload = true;
-			return true;
-		}
-		
+		String fileTemp = fileName +"tmp";
+			
 		FileOutputStream fos = null;
 		BufferedInputStream bis = null;
 		HttpURLConnection httpUrl = null;
@@ -42,7 +38,7 @@ public class NetClient {
 			httpUrl = (HttpURLConnection) url.openConnection();
 			httpUrl.connect();
 			bis = new BufferedInputStream(httpUrl.getInputStream());
-			fos = new FileOutputStream(fileName);
+			fos = new FileOutputStream(fileTemp);
 			
 			while ((size = bis.read(buf)) != -1)
 			            fos.write(buf, 0, size);
@@ -57,7 +53,7 @@ public class NetClient {
 			bRet = false;
 		}
 		
-		bDownload = true;
+		bRet = Utility.moveFile(fileTemp, fileName);
 		return bRet;
 
 	}
