@@ -89,8 +89,6 @@ public class PlayerActivity extends Activity {
 	        // TODO Auto-generated method stub  
 	        NetClient c = new NetClient();
 	            
-	        Iterator<DownloadItem> it = Configuration.siteConfig.listFiles.iterator();
-	        
 	        //the client.cfg must download very time
 	        DownloadItem item = Configuration.siteConfig.listFiles.get(0);
 	    	AppKernel.netStatus = Net_Status.downloadingMovie;
@@ -98,7 +96,7 @@ public class PlayerActivity extends Activity {
 	    	{
 	    		boolean bRet = c.downloadFile(item.URL);
 	     		if (bRet) {
-	     			AppKernel.netStatus = Net_Status.finish;
+	     			item.status = Net_Status.finish;
 	     			Configuration.siteConfig.ParseConfig();
 	     			break;
 	     		}
@@ -107,7 +105,7 @@ public class PlayerActivity extends Activity {
 	    	int size = Configuration.siteConfig.listFiles.size();
 	    	for (int i = 1; i<size; i++)
 	    	{
-            	item = it.next();
+            	item = Configuration.siteConfig.listFiles.get(i);
 	           	String localFile = AppEnv.getLocalFile(item.URL);
 	           	boolean exist = Utility.fileExists(localFile);
 	           	if (exist){

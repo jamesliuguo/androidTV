@@ -1,5 +1,7 @@
 package com.v.tv;
 
+import java.io.File;
+
 import android.os.Environment;
 
 public class AppEnv {
@@ -12,6 +14,8 @@ public class AppEnv {
 	   String err = null;
 	   try{
 		   localCachePath = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Player/";
+		   File file = new File(localCachePath);
+		   file.mkdir();
 	   }
 	   catch(Exception e) {
 		   err = e.getMessage();

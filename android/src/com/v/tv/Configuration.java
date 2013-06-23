@@ -121,11 +121,10 @@ class SiteConfig
 			String name = builder.toString();
 			String value= properties.getProperty(name);
 			if (value == null) break;
-			if (value.isEmpty()) break;
 			
 			DownloadItem it = new DownloadItem();
-			it.fileName =  clientconfg;
-			it.URL = Configuration.buildURL(it.fileName);
+			it.fileName =  value;
+			it.URL = Configuration.buildURL(value);
 			it.status = Net_Status.pending;
 			listFiles.add(it);
 		}

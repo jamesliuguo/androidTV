@@ -48,7 +48,7 @@ public class Utility {
 	{
 		boolean success = false;
 		 File file = new File(from);
-		 File file2 = new File("newname");
+		 File file2 = new File(to);
 		 if(file2.exists()) file2.delete();
 		  // Rename file (or directory)
 		 success = file.renameTo(file2);
