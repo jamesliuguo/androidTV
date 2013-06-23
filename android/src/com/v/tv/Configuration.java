@@ -4,17 +4,22 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
 class BasicConfig
 {
-	public static  String serverIP = "192.168.1.1";
+	public static  String serverIP = "192.168.1.105";
 	public static String  clientName = "client1";
 	private static String configFile()
 	{
 		return AppEnv.getLocalPath()+ "basic.cfg";
+	}
+	public void removeConfig()
+	{
+		Utility.delFile(configFile());
 	}
 	public static boolean save()
 	{
@@ -64,26 +69,27 @@ class DownloadItem
 	public Net_Status status;
 }
 class SiteConfig
-{
+{	
+	public  String clientconfg = "client.cfg";
 	//analyze the client.cfg file from server
-	public static List<DownloadItem> listFiles;
-	public static void init()
+	public  List<DownloadItem> listFiles;
+	public  void init()
 	{
-		if (listFiles == null) listFiles = new LinkedList<DownloadItem>();
+		if (listFiles == null) listFiles = new ArrayList<DownloadItem>();
 		DownloadItem it = new DownloadItem();
 		it.fileName =  clientconfg;
 		it.URL = Configuration.buildURL(it.fileName);
 		it.status = Net_Status.pending;
 		listFiles.add(it);
 	}
-	public static boolean configFinishDownload()
+	public  boolean configFinishDownload()
 	{
 		boolean finish = false;
 		DownloadItem it = listFiles.get(0);
 		if (it.status == Net_Status.finish) finish = true;
 		return finish;
 	}
-	public static boolean allFinishDownload()
+	public  boolean allFinishDownload()
 	{
 		int last = listFiles.size() -1;
 		//
@@ -94,9 +100,7 @@ class SiteConfig
 		if (it.status == Net_Status.finish) finish = true;
 		return finish;
 	}
-	public static String clientconfg = "client.cfg";
-	
-	public static boolean ParseConfig() 
+	public  boolean ParseConfig() 
 	{
 		if (!configFinishDownload()) return false;
 		
@@ -110,7 +114,7 @@ class SiteConfig
 				
 		}
 
-		for(int i = 0; i<10; i++)
+		for(int i = 1; i<10; i++)
 		{
 			StringBuilder builder = new StringBuilder();
 			builder.append("moviefile").append(i);

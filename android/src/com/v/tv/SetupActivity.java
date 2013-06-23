@@ -2,6 +2,7 @@ package com.v.tv;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
@@ -37,6 +38,11 @@ public class SetupActivity extends Activity {
 				Configuration.basConfig.serverIP = strIp;
 				Configuration.basConfig.clientName = strName;
 				Configuration.basConfig.save();
+				
+	    		Intent t = new Intent();
+	    		t.setClass(SetupActivity.this, PlayerActivity.class);
+	    		startActivity(t);
+	    		SetupActivity.this.finish();
 				
 			}
         });

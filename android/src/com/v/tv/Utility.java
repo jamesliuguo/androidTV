@@ -2,6 +2,12 @@ package com.v.tv;
 
 import java.io.File;
 
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.content.Context;
+import android.net.wifi.WifiManager;
+import android.provider.Settings.Secure;
+
 public class Utility {
 	static public boolean reboot()
 	{
@@ -47,5 +53,33 @@ public class Utility {
 		  // Rename file (or directory)
 		 success = file.renameTo(file2);
 		 return success;
+	}
+	public static boolean delFile(String str)
+	{
+		boolean success =false;
+		try{
+			File file = new File(str);
+			success = file.delete();	
+		}
+		catch(Exception e){
+			
+		}
+		return success;
+		
+	}
+	public static String UID(Context context)
+	{
+		String macAddress = "";
+		WifiManager wm = (WifiManager)context.getSystemService(Context.WIFI_SERVICE); 
+		macAddress = wm.getConnectionInfo().getMacAddress();
+		
+		String blueTooth = "";
+		BluetoothAdapter m_BluetoothAdapter = null; // Local Bluetooth adapter      
+		m_BluetoothAdapter = BluetoothAdapter.getDefaultAdapter();      
+		blueTooth = m_BluetoothAdapter.getAddress();
+		
+		//String m_szAndroidID = Secure.getString(getContentResolver(), Secure.ANDROID_ID);
+
+		return macAddress + blueTooth;
 	}
 }

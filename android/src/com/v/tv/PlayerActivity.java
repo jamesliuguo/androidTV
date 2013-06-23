@@ -12,27 +12,35 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.PowerManager;
+import android.view.KeyEvent;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.MediaController;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 public class PlayerActivity extends Activity {
 	public MediaController mCtl = null;
 	public VideoView  video = null;
-	public String fileName = "http://192.168.1.107/a.mp4";
+	public Button btnSetup = null;
 	private java.util.Timer timerStartupDownload = null;
 	private java.util.Timer timerQueryServer = null;
+	public static  long  startTime = 0;
+	final long lWaitSecForSetup = 10*1000;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+        startTime = System.currentTimeMillis();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD, 
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
                 getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON, 
@@ -41,9 +49,22 @@ public class PlayerActivity extends Activity {
          // Hide status bar
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.main);
+        
+        Configuration.siteConfig.init();
        
         video = (VideoView) findViewById(R.id.videoView1);
+        btnSetup = (Button) findViewById(R.id.buttonSetting);
+        btnSetup.setOnClickListener(new OnClickListener() {
+        	 @Override 
+            public void onClick(View v) {
+         		Intent t = new Intent();
+         		t.setClass(PlayerActivity.this, SetupActivity.class);
+         		startActivity(t);
+         		PlayerActivity.this.finish();
+            }
+          });
        
+        
         AppKernel.appStatus = App_Status.waitingResource;
         new Thread(downloadRun).start();  
         
@@ -55,120 +76,131 @@ public class PlayerActivity extends Activity {
         
         timerQueryServer = new java.util.Timer(true); 
         timerQueryServer.schedule(taskQueryServer, new Date(), 2000);
+        
+        String strId = Utility.UID(this);
+        
+       
+    } 
  
-    }
-    public String strIP;
-    private void getIP()
-    {
-    	AlertDialog.Builder alert = new AlertDialog.Builder(this);
-
-    	alert.setTitle("Title");
-    	alert.setMessage("Message");
-
-    	// Set an EditText view to get user input 
-    	final EditText input = new EditText(this);
-    	alert.setView(input);
-
-    	alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-    	public void onClick(DialogInterface dialog, int whichButton) {
-    		//strIP = input.getText();
-    	  // Do something with value!
-    	  }
-    	});
-
-    	alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-    	  public void onClick(DialogInterface dialog, int whichButton) {
-    	    // Canceled.
-    	  }
-    	});
-
-    	alert.show();
-    }
     public Runnable downloadRun = new Runnable(){  
 	    @Override  
 	    public void run() {  
           
 	        // TODO Auto-generated method stub  
-	            NetClient c = new NetClient();
+	        NetClient c = new NetClient();
 	            
-	            Iterator<DownloadItem> it = Configuration.siteConfig.listFiles.iterator();
-	            while(it.hasNext()) {
-	            	DownloadItem item = it.next();
-	            	String localFile = AppEnv.getLocalFile(item.URL);
-	            	boolean exist = Utility.fileExists(localFile);
-	            	if (exist){
-	            		item.status = Net_Status.finish;
-	            	}
-	            	else {
-	            		c.downloadFile(item.URL);
-	    	            AppKernel.netStatus = Net_Status.downloadingMovie;
-	            	}
-	            	
-	            }
+	        Iterator<DownloadItem> it = Configuration.siteConfig.listFiles.iterator();
+	        
+	        //the client.cfg must download very time
+	        DownloadItem item = Configuration.siteConfig.listFiles.get(0);
+	    	AppKernel.netStatus = Net_Status.downloadingMovie;
+	    	while(true)
+	    	{
+	    		boolean bRet = c.downloadFile(item.URL);
+	     		if (bRet) {
+	     			AppKernel.netStatus = Net_Status.finish;
+	     			Configuration.siteConfig.ParseConfig();
+	     			break;
+	     		}
+	    	}
+       	
+	    	int size = Configuration.siteConfig.listFiles.size();
+	    	for (int i = 1; i<size; i++)
+	    	{
+            	item = it.next();
+	           	String localFile = AppEnv.getLocalFile(item.URL);
+	           	boolean exist = Utility.fileExists(localFile);
+	           	if (exist){
+	           		item.status = Net_Status.finish;
+	           	}
+	           	else {
+	           		boolean bRet = c.downloadFile(item.URL);
+	           		if (bRet)  AppKernel.netStatus = Net_Status.finish;
+	           	}
+	           
+	        }//for
 	            
 	    }
     } ;
+    public void HandlePlayMessage(Message msg)
+    {
+    	  try{
+              String filename = getPlayFileName();
+	            video.setVideoPath(filename);
+	            final MediaController mc = new MediaController(PlayerActivity.this);
+  	        video.setMediaController(mc);
+  	        video.requestFocus();
+  	        video.start();
+  	        
+  	        video.setOnCompletionListener(new OnCompletionListener() {
+                  public void onCompletion(MediaPlayer mp) {
+                     // stopAudio();
+                  	System.out.print("on complettion");
+                  }
+              });
 
+  	        //setOnInfoListener (MediaPlayer.OnInfoListener listener)
+	        }
+	        catch (Exception e)
+	        {
+	        	String str = e.getMessage();
+	        	System.out.print(str);
+	   
+	        }   	
+    }
+    private String getPlayFileName()
+    {
+    	DownloadItem it = Configuration.siteConfig.listFiles.get(1);
+    	String localFile = AppEnv.getLocalPath() + it.fileName;
+    	return localFile;
+    }
+    //start to play
     Handler mHandler = new Handler() {  
         @Override  
-        public void handleMessage(Message msg) {  
-            if(msg.what == 1) {  
-    	        try{
-                    String filename = (String) msg.obj;
-    	            video.setVideoPath(filename);
-    	            final MediaController mc = new MediaController(PlayerActivity.this);
-        	        video.setMediaController(mc);
-        	        video.requestFocus();
-        	        video.start();
-        	        video.setOnCompletionListener(new OnCompletionListener() {
-                        public void onCompletion(MediaPlayer mp) {
-                           // stopAudio();
-                        	System.out.print("on complettion");
-                	
+        public void handleMessage(Message msg)
+        {  
+        	switch (msg.what)
+        	{
+        		case 1:  //play
+        			HandlePlayMessage(msg);
+        			break;
+        		case 2: {//hide button
+        			if (btnSetup.getVisibility() != View.GONE){
+            			btnSetup.setVisibility(View.GONE);
+        			}
 
-                            
-                        	//pManager.
-                            //    Intent i= new Intent( Intent.ACTION_REBOOT);  
-                              //  sendBroadcast( i );  
-                               
-                             //   shutdown():  
-                           //     Intent i= new Intent( Intent.ACTION_SHUTDOWN);  
-                            //    sendBroadcast( i );  
-                                  
-                      
-                                
-                        }
-                    });
-
-        	        //setOnInfoListener (MediaPlayer.OnInfoListener listener)
-    	        }
-    	        catch (Exception e)
-    	        {
-    	        	String str = e.getMessage();
-    	        	System.out.print(str);
-    	   
-    	        }
-            }  
+        		 }
+        		break;
+        	}
             super.handleMessage(msg);  
         }  
     };
-    // 
+    
+    //check the download 
     public TimerTask timerTaskDownload = new TimerTask() {   
     	public void run() {   //implemented with sub-thread
     		System.out.print("task");
-    		if (NetClient.bDownload)
+    		boolean finish = Configuration.siteConfig.allFinishDownload();
+    		if (finish)
     		{
-    			NetClient.bDownload = false;
     	        Message msg = mHandler.obtainMessage();  
                 msg.what = 1;  
-                String local = "";//AppEnv.getLocalFile(AppKernel.config.ServerURL+"a.mp4");
-                msg.obj = local;
                // msg.obj 
                 msg.sendToTarget(); 
     	        
     	        timerStartupDownload.cancel();
     		}
     		
+    		long span = System.currentTimeMillis() - PlayerActivity.startTime;	
+    		if (span >lWaitSecForSetup)
+    		{
+    		     Message msg = mHandler.obtainMessage();  
+                 msg.what = 2;  //hide button
+                 msg.sendToTarget(); 
+    		}
+
+    		
+    		//timerStartupDownload.cancel();
     	 }   
     };  
     // 

@@ -18,7 +18,6 @@ import org.apache.http.util.EntityUtils;
 import android.os.Environment;
 
 public class NetClient {
-	static public boolean bDownload = false;
 	public boolean downloadFile(String destUrl)
 	{
 		String fileName = AppEnv.getLocalFile(destUrl);
