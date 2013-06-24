@@ -5,25 +5,37 @@
     android:orientation="vertical" >
 
     <TextView
-        android:layout_width="fill_parent"
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello" />
+        android:text="服务器名或IP" />
     <EditText 
         android:id="@+id/editTextIP"
         android:inputType="textUri"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"/>
-    
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="客户端ID" />
     <EditText 
         android:id="@+id/editName"
         android:inputType="text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:textSize="18sp"/>
+
+    <CheckBox
+        android:id="@+id/checkBox1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="显示设置按钮（调试成熟后关掉）" />
+
     <Button 
         android:id="@+id/buttonSave"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Save"/>
+        android:text="保存"/>
 </LinearLayout>

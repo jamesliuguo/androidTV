@@ -11,9 +11,10 @@ import java.util.Properties;
 
 class BasicConfig
 {
-	public static  String serverIP = "192.168.1.105";
-	public static String  clientName = "client1";
-	private static String configFile()
+	public  String serverIP = "192.168.1.105";
+	public  String  clientName = "client1";
+	public  boolean showSetting = true;
+	private  String configFile()
 	{
 		return AppEnv.getLocalPath()+ "basic.cfg";
 	}
@@ -21,7 +22,7 @@ class BasicConfig
 	{
 		Utility.delFile(configFile());
 	}
-	public static boolean save()
+	public  boolean save()
 	{
 		boolean success = false;
 		String filename = configFile();
@@ -30,6 +31,9 @@ class BasicConfig
 		    final FileOutputStream cfg = new FileOutputStream(filename);
 		    properties.setProperty("serverIP", serverIP);
 		    properties.setProperty("clientName", clientName);
+		    
+		    String str = showSetting? "true":"false";
+		    properties.setProperty("showSetting", str);
 		    properties.store(cfg, "");
 		    success = true;
 			
@@ -41,7 +45,7 @@ class BasicConfig
 
 		return success;
 	}
-	public static boolean read()
+	public boolean read()
 	{
 		boolean success = false;
 		String filename = configFile();
@@ -51,6 +55,11 @@ class BasicConfig
 			properties.load(cfg);	
 			serverIP= properties.getProperty("serverIP");
 			clientName = properties.getProperty("clientName");
+			
+			String str = properties.getProperty("showSetting");
+			if (str == null || str =="true") showSetting = true;
+			else showSetting = false;
+			
 			success = true;
 		}
 		catch(Exception e)
@@ -134,16 +143,26 @@ class SiteConfig
 }
 
 public class Configuration {
+	private static Configuration  _instance = null;
+	public static Configuration  getInstance(){
+		if (_instance == null){
+			_instance =  new Configuration();
+			_instance.basConfig.read();
+			_instance.siteConfig.init();
+		}
+		return _instance;
+	}
+	
 	//the first item
-	public static BasicConfig   basConfig = new BasicConfig();
-	public static SiteConfig    siteConfig = new SiteConfig();
-	public static String siteConfigURL()
+	public  BasicConfig   basConfig = new BasicConfig();
+	public  SiteConfig    siteConfig = new SiteConfig();
+	public  String siteConfigURL()
 	{
 		return "";
 	}
 	public static String buildURL(String purlFile)
 	{
-		String str = "http://" + basConfig.serverIP + "/" + purlFile;
+		String str = "http://" + getInstance().basConfig.serverIP + "/" + purlFile;
 		return str;
 	}
 	

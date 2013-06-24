@@ -14,12 +14,14 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int buttonSave=0x7f050002;
-        public static final int buttonSetting=0x7f050003;
-        public static final int editName=0x7f050001;
-        public static final int editTextIP=0x7f050000;
-        public static final int videoView1=0x7f050004;
-        public static final int webView1=0x7f050005;
+        public static final int buttonSave=0x7f050004;
+        public static final int buttonSetting=0x7f050005;
+        public static final int checkBox1=0x7f050003;
+        public static final int editName=0x7f050002;
+        public static final int editTextIP=0x7f050001;
+        public static final int textView1=0x7f050000;
+        public static final int videoView1=0x7f050006;
+        public static final int webView1=0x7f050007;
     }
     public static final class layout {
         public static final int config=0x7f030000;

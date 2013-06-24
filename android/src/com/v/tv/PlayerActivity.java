@@ -38,8 +38,8 @@ public class PlayerActivity extends Activity {
 	private java.util.Timer timerStartupDownload = null;
 	private java.util.Timer timerQueryServer = null;
 	public static  long  startTime = 0;
-	final long lWaitSecForSetup = 10*1000;
-	public static boolean webMode = true;
+	final long lWaitSecForSetup = 20*1000;
+	public static boolean webMode = false;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -54,7 +54,8 @@ public class PlayerActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.main);
         
-        Configuration.siteConfig.init();
+
+
        
         webView = (WebView) findViewById(R.id.webView1);
         video = (VideoView) findViewById(R.id.videoView1);
@@ -79,6 +80,8 @@ public class PlayerActivity extends Activity {
             }
           });
        
+        boolean show = Configuration.getInstance().basConfig.showSetting;
+      //  if (!show) btnSetup.setVisibility(View.GONE);
         
         AppKernel.appStatus = App_Status.waitingResource;
         new Thread(downloadRun).start();  
@@ -105,22 +108,22 @@ public class PlayerActivity extends Activity {
 	        NetClient c = new NetClient();
 	            
 	        //the client.cfg must download very time
-	        DownloadItem item = Configuration.siteConfig.listFiles.get(0);
+	        DownloadItem item = Configuration.getInstance().siteConfig.listFiles.get(0);
 	    	AppKernel.netStatus = Net_Status.downloadingMovie;
 	    	while(true)
 	    	{
 	    		boolean bRet = c.downloadFile(item.URL);
 	     		if (bRet) {
 	     			item.status = Net_Status.finish;
-	     			Configuration.siteConfig.ParseConfig();
+	     			Configuration.getInstance().siteConfig.ParseConfig();
 	     			break;
 	     		}
 	    	}
        	
-	    	int size = Configuration.siteConfig.listFiles.size();
+	    	int size = Configuration.getInstance().siteConfig.listFiles.size();
 	    	for (int i = 1; i<size; i++)
 	    	{
-            	item = Configuration.siteConfig.listFiles.get(i);
+            	item = Configuration.getInstance().siteConfig.listFiles.get(i);
 	           	String localFile = AppEnv.getLocalFile(item.URL);
 	           	boolean exist = Utility.fileExists(localFile);
 	           	if (exist){
@@ -163,7 +166,7 @@ public class PlayerActivity extends Activity {
     }
     private String getPlayFileName()
     {
-    	DownloadItem it = Configuration.siteConfig.listFiles.get(1);
+    	DownloadItem it = Configuration.getInstance().siteConfig.listFiles.get(1);
     	String localFile = AppEnv.getLocalPath() + it.fileName;
     	return localFile;
     }
@@ -193,7 +196,7 @@ public class PlayerActivity extends Activity {
     public TimerTask timerTaskDownload = new TimerTask() {   
     	public void run() {   //implemented with sub-thread
     		System.out.print("task");
-    		boolean finish = Configuration.siteConfig.allFinishDownload();
+    		boolean finish = Configuration.getInstance().siteConfig.allFinishDownload();
     		if (finish)
     		{
     	        Message msg = mHandler.obtainMessage();  
