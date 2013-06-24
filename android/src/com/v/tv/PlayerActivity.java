@@ -22,6 +22,8 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.MediaController;
@@ -32,10 +34,12 @@ public class PlayerActivity extends Activity {
 	public MediaController mCtl = null;
 	public VideoView  video = null;
 	public Button btnSetup = null;
+	public WebView   webView = null;
 	private java.util.Timer timerStartupDownload = null;
 	private java.util.Timer timerQueryServer = null;
 	public static  long  startTime = 0;
 	final long lWaitSecForSetup = 10*1000;
+	public static boolean webMode = true;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,18 @@ public class PlayerActivity extends Activity {
         
         Configuration.siteConfig.init();
        
+        webView = (WebView) findViewById(R.id.webView1);
         video = (VideoView) findViewById(R.id.videoView1);
+        if (webMode){
+        	WebSettings set = webView.getSettings();
+        	set.setAllowFileAccess(true);
+        	set.setJavaScriptEnabled(true);
+        	webView.loadUrl("http://www.baidu.com");
+        	video.setVisibility(View.GONE);
+        }
+        else{
+        	webView.setVisibility(View.GONE);
+        }
         btnSetup = (Button) findViewById(R.id.buttonSetting);
         btnSetup.setOnClickListener(new OnClickListener() {
         	 @Override 
