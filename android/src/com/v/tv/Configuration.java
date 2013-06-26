@@ -77,14 +77,17 @@ class DownloadItem
 	public String URL;
 	public Net_Status status;
 }
+
 class SiteConfig
 {	
 	public  String clientconfg = "client.cfg";
 	//analyze the client.cfg file from server
 	public  List<DownloadItem> listFiles;
+	public  PlayMode   playMode;
 	public  void init()
 	{
 		if (listFiles == null) listFiles = new ArrayList<DownloadItem>();
+		listFiles.clear();
 		DownloadItem it = new DownloadItem();
 		it.fileName =  clientconfg;
 		it.URL = Configuration.buildURL(it.fileName);
@@ -141,8 +144,14 @@ class SiteConfig
 		return true;
 	}
 }
-
+enum PlayMode
+{
+	once,
+	singleFileLoop,
+	listLoop,
+}
 public class Configuration {
+
 	private static Configuration  _instance = null;
 	public static Configuration  getInstance(){
 		if (_instance == null){
@@ -166,4 +175,20 @@ public class Configuration {
 		return str;
 	}
 	
+	public  String nextPlayFile()
+	{
+		String strFile = "";
+		switch (siteConfig.playMode)
+		{
+		case singleFileLoop:
+			//siteConfig
+			break;
+		case listLoop:
+			break;
+		case once:
+			break;
+		}
+		return strFile;
+	}
+	private int index = 1;
 }
