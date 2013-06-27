@@ -174,21 +174,5 @@ public class Configuration {
 		String str = "http://" + getInstance().basConfig.serverIP + "/" + purlFile;
 		return str;
 	}
-	
-	public  String nextPlayFile()
-	{
-		String strFile = "";
-		switch (siteConfig.playMode)
-		{
-		case singleFileLoop:
-			//siteConfig
-			break;
-		case listLoop:
-			break;
-		case once:
-			break;
-		}
-		return strFile;
-	}
-	private int index = 1;
+
 }

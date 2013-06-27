@@ -174,6 +174,16 @@ public class PlayerActivity extends Activity {
   	   			@Override
 				public boolean onError(MediaPlayer mp, int what, int extra) {
 					// TODO Auto-generated method stub
+	  	   		  	System.out.print("on complettion");
+	              	String filename = getPlayFileName();
+	                mp.reset();
+	              	//decrease the flash
+	              	if (filename.compareTo(lastPlayfile) !=0 ){
+	                  	video.setVideoPath(filename);		
+	              	}
+	
+	              	lastPlayfile = filename;
+	                video.start();
 					return false;
 				}
   	        });
@@ -187,14 +197,30 @@ public class PlayerActivity extends Activity {
 	   
 	        }   	
     }
-    private int fileIndex = 1;
+    private int fileIndex = 3;
     private String getPlayFileName()
     {
     	List<DownloadItem> list = Configuration.getInstance().siteConfig.listFiles;
-    	PlayMode m = Configuration.getInstance().siteConfig.playMode;
-    
-    	DownloadItem it = list.get(1);
+    	/*PlayMode m = Configuration.getInstance().siteConfig.playMode;
+    	
+    	switch (Configuration.getInstance().siteConfig.playMode)
+		{
+		case singleFileLoop:
+			//siteConfig
+			break;
+		case listLoop:
+			break;
+		case once:
+			break;
+		}*/
+    	
+    	int size = list.size();
+    	if (fileIndex>=size) fileIndex = 1;
+    	  	
+    	DownloadItem it = list.get(fileIndex);
     	String localFile = AppEnv.getLocalPath() + it.fileName;
+    	fileIndex++;
+    	
     	return localFile;
     }
     //start to play
