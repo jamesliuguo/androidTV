@@ -2,6 +2,7 @@ package com.v.tv;
 
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -40,10 +41,12 @@ public class PlayerActivity extends Activity {
 	public static  long  startTime = 0;
 	final long lWaitSecForSetup = 20*1000;
 	public static boolean webMode = false;
+	public static PlayerActivity playActivity = null;
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        playActivity = this;
         startTime = System.currentTimeMillis();
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD, 
                 WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
@@ -55,20 +58,8 @@ public class PlayerActivity extends Activity {
         setContentView(R.layout.main);
         
 
-
-       
         webView = (WebView) findViewById(R.id.webView1);
         video = (VideoView) findViewById(R.id.videoView1);
-        if (webMode){
-        	WebSettings set = webView.getSettings();
-        	set.setAllowFileAccess(true);
-        	set.setJavaScriptEnabled(true);
-        	webView.loadUrl("http://www.baidu.com");
-        	video.setVisibility(View.GONE);
-        }
-        else{
-        	webView.setVisibility(View.GONE);
-        }
         btnSetup = (Button) findViewById(R.id.buttonSetting);
         btnSetup.setOnClickListener(new OnClickListener() {
         	 @Override 
@@ -79,27 +70,41 @@ public class PlayerActivity extends Activity {
          		PlayerActivity.this.finish();
             }
           });
+        
+        if (webMode){
+        	WebSettings set = webView.getSettings();
+        	set.setAllowFileAccess(true);
+        	set.setJavaScriptEnabled(true);
+        	webView.loadUrl("http://www.baidu.com");
+        	video.setVisibility(View.GONE);
+        	webView.setVisibility(View.VISIBLE);
+        }
+        else{
+        	video.setVisibility(View.VISIBLE);
+        	webView.setVisibility(View.GONE);
+        }
+      
        
         boolean show = Configuration.getInstance().basConfig.showSetting;
       //  if (!show) btnSetup.setVisibility(View.GONE);
         
-        AppKernel.appStatus = App_Status.waitingResource;
-        new Thread(downloadRun).start();  
-        
- 
-       // getIP();
-        
-        timerStartupDownload = new java.util.Timer(true); 
-        timerStartupDownload.schedule(timerTaskDownload, new Date(), 2000);
-        
-        timerQueryServer = new java.util.Timer(true); 
-        timerQueryServer.schedule(taskQueryServer, new Date(), 2000);
+        settingChanges();
         
         String strId = Utility.UID(this);
         
-       
     } 
- 
+    public void settingChanges()
+    {
+    	 AppKernel.appStatus = App_Status.waitingResource;
+         new Thread(downloadRun).start();  
+         
+       
+         timerStartupDownload = new java.util.Timer(true); 
+         timerStartupDownload.schedule(timerTaskDownload, new Date(), 2000);
+         
+         timerQueryServer = new java.util.Timer(true); 
+         timerQueryServer.schedule(taskQueryServer, new Date(), 2000);
+    }
     public Runnable downloadRun = new Runnable(){  
 	    @Override  
 	    public void run() {  
@@ -138,11 +143,13 @@ public class PlayerActivity extends Activity {
 	            
 	    }
     } ;
+    private String lastPlayfile;
     public void HandlePlayMessage(Message msg)
     {
     	  try{
               String filename = getPlayFileName();
-	            video.setVideoPath(filename);
+	           video.setVideoPath(filename);
+	           lastPlayfile = filename;  
 	            final MediaController mc = new MediaController(PlayerActivity.this);
   	        video.setMediaController(mc);
   	        video.requestFocus();
@@ -152,8 +159,24 @@ public class PlayerActivity extends Activity {
                   public void onCompletion(MediaPlayer mp) {
                      // stopAudio();
                   	System.out.print("on complettion");
+                  	String filename = getPlayFileName();
+                  	
+                  	//decrease the flash
+                  	if (filename.compareTo(lastPlayfile) !=0 ){
+                      	video.setVideoPath(filename);		
+                  	}
+
+                  	lastPlayfile = filename;
+                    video.start();
                   }
               });
+  	        video.setOnErrorListener(new MediaPlayer.OnErrorListener(){
+  	   			@Override
+				public boolean onError(MediaPlayer mp, int what, int extra) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+  	        });
 
   	        //setOnInfoListener (MediaPlayer.OnInfoListener listener)
 	        }
@@ -164,9 +187,13 @@ public class PlayerActivity extends Activity {
 	   
 	        }   	
     }
+    private int fileIndex = 1;
     private String getPlayFileName()
     {
-    	DownloadItem it = Configuration.getInstance().siteConfig.listFiles.get(1);
+    	List<DownloadItem> list = Configuration.getInstance().siteConfig.listFiles;
+    	PlayMode m = Configuration.getInstance().siteConfig.playMode;
+    
+    	DownloadItem it = list.get(1);
     	String localFile = AppEnv.getLocalPath() + it.fileName;
     	return localFile;
     }
@@ -197,16 +224,19 @@ public class PlayerActivity extends Activity {
     	public void run() {   //implemented with sub-thread
     		System.out.print("task");
     		boolean finish = Configuration.getInstance().siteConfig.allFinishDownload();
-    		if (finish)
+    		if (finish)  //play
     		{
     	        Message msg = mHandler.obtainMessage();  
                 msg.what = 1;  
+                
+   
                // msg.obj 
                 msg.sendToTarget(); 
     	        
     	        timerStartupDownload.cancel();
     		}
     		
+    		//hide button
     		long span = System.currentTimeMillis() - PlayerActivity.startTime;	
     		if (span >lWaitSecForSetup)
     		{
@@ -226,5 +256,22 @@ public class PlayerActivity extends Activity {
     		// get task and execute, sendToget the message
     	 }   
     };
-    
+    public void OnStart()
+    {
+    	super.onStart();
+    	
+    }
+    public void OnResume()
+    {
+    	super.onResume();
+    }
+    public void OnPause()
+    {
+    	super.onPause();
+    }
+    public void OnStop()
+    {
+    	super.onStop();
+ 
+    }
 }

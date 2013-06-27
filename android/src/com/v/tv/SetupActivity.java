@@ -49,6 +49,9 @@ public class SetupActivity extends Activity {
 	    		t.setClass(SetupActivity.this, PlayerActivity.class);
 	    		startActivity(t);
 	    		SetupActivity.this.finish();
+	    		
+	    		Configuration.getInstance().siteConfig.init();
+	    		PlayerActivity.playActivity.settingChanges();
 				
 			}
         });
